@@ -1,4 +1,4 @@
-import type { CropVariant, FrameDocument, Ratio } from './model';
+import type { CropVariant, FrameDocument, ImageAsset, Ratio } from './model';
 
 const clamp = (value: number, min = 0, max = 1): number => Math.min(max, Math.max(min, value));
 
@@ -48,6 +48,27 @@ export function resizeCrop(crop: CropVariant, width: number, height: number): Cr
 
 export function makeVariant(crop: CropVariant, id: string): CropVariant {
   return { ...normalizeCrop(crop), id };
+}
+
+export interface CropViewport {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * The image-pixel window a crop frames. Every preview of a crop (variant card,
+ * comparison tile, stage frame) must show exactly this region — it depends only
+ * on the crop and the image, never on the size of the box it is displayed in.
+ */
+export function cropViewport(image: ImageAsset, crop: CropVariant): CropViewport {
+  return {
+    x: crop.x * image.width,
+    y: crop.y * image.height,
+    width: crop.width * image.width,
+    height: crop.height * image.height,
+  };
 }
 
 export function isFrameDocument(value: unknown): value is FrameDocument {
