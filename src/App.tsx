@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CanvasStage } from './components/CanvasStage';
+import { CropPreview } from './components/CropPreview';
 import { EmptyState } from './components/EmptyState';
 import { Toolbar } from './components/Toolbar';
 import { VariantList } from './components/VariantList';
@@ -40,5 +41,5 @@ export default function App() {
 }
 
 function Comparison({ image, variants }: { image: ImageAsset; variants: CropVariant[] }) {
-  return <div className="comparison"><div className="compare-intro"><p className="eyebrow">SIDE BY SIDE / {variants.length} FRAMES</p><h2>把取舍放在一起看</h2><p>保存的每个版本都保留原图，只改变裁切窗口。</p></div>{variants.length === 0 ? <div className="compare-empty">先在工作台保存至少一个裁切方案。</div> : <div className="comparison-grid">{variants.map((variant, index) => <article key={variant.id}><div className="compare-image"><img src={image.src} alt={`方案 ${index + 1}`} style={{ objectPosition: `${variant.x * 100}% ${variant.y * 100}%` }} /><span>方案 {String(index + 1).padStart(2, '0')}</span></div><div><strong>{variant.ratio === 'free' ? '自由裁切' : variant.ratio}</strong><small>{Math.round(variant.width * 100)}% × {Math.round(variant.height * 100)}%</small></div></article>)}</div>}</div>;
+  return <div className="comparison"><div className="compare-intro"><p className="eyebrow">SIDE BY SIDE / {variants.length} FRAMES</p><h2>把取舍放在一起看</h2><p>保存的每个版本都保留原图，只改变裁切窗口。</p></div>{variants.length === 0 ? <div className="compare-empty">先在工作台保存至少一个裁切方案。</div> : <div className="comparison-grid">{variants.map((variant, index) => <article key={variant.id}><CropPreview className="compare-image" image={image} crop={variant}><span>方案 {String(index + 1).padStart(2, '0')}</span></CropPreview><div><strong>{variant.ratio === 'free' ? '自由裁切' : variant.ratio}</strong><small>{Math.round(variant.width * 100)}% × {Math.round(variant.height * 100)}%</small></div></article>)}</div>}</div>;
 }

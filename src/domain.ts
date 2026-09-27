@@ -1,4 +1,4 @@
-import type { CropVariant, FrameDocument, Ratio } from './model';
+import type { CropVariant, FrameDocument, ImageAsset, Ratio } from './model';
 
 const clamp = (value: number, min = 0, max = 1): number => Math.min(max, Math.max(min, value));
 
@@ -48,6 +48,33 @@ export function resizeCrop(crop: CropVariant, width: number, height: number): Cr
 
 export function makeVariant(crop: CropVariant, id: string): CropVariant {
   return { ...normalizeCrop(crop), id };
+}
+
+export interface CropViewport {
+  /** Aspect ratio of the cropped region in image pixels (width / height). */
+  aspect: number;
+  /** Full-image size as a percentage of the viewport (the crop region = 100%). */
+  imageWidth: number;
+  imageHeight: number;
+  /** Full-image offset as a percentage of the viewport, placing the crop at the origin. */
+  imageLeft: number;
+  imageTop: number;
+}
+
+/**
+ * Maps a saved crop rect onto a viewport that shows exactly the cropped region.
+ * Every preview (card thumbnail, comparison view) must use this same mapping so
+ * a variant frames the identical image area everywhere it is rendered.
+ */
+export function cropViewport(crop: CropVariant, image: ImageAsset): CropViewport {
+  return {
+    aspect: (crop.width * image.width) / (crop.height * image.height),
+    imageWidth: 100 / crop.width,
+    imageHeight: 100 / crop.height,
+    // `+ 0` normalizes -0 so offsets never serialize as "-0%" in CSS.
+    imageLeft: (-100 * crop.x) / crop.width + 0,
+    imageTop: (-100 * crop.y) / crop.height + 0,
+  };
 }
 
 export function isFrameDocument(value: unknown): value is FrameDocument {
